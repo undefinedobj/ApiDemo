@@ -1,0 +1,16 @@
+<?php
+
+namespace DummyNamespace;
+
+use League\Fractal\TransformerAbstract;
+use App\User;
+
+class DummyClass extends TransformerAbstract
+{
+    public function transform(Access $model)
+    {
+        return [
+            // code
+        ];
+    }
+}
