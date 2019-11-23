@@ -61,3 +61,12 @@ Route::group(['middleware' => 'jwt.refresh'], function(){
     // 检查当前登录用户 token 是否仍然有效
     Route::get('auth/refresh', 'AuthController@refresh');
 });
+/*
+|--------------------------------------------------------------------------
+| Dingo/Api Routes
+|--------------------------------------------------------------------------
+*/
+$api = app(\Dingo\Api\Routing\Router::class);
+$api->version('v1', function ($api) {
+
+});
