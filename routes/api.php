@@ -84,6 +84,9 @@ $api->version('v3',[
     'namespace' => 'App\Http\Controllers\Api',
 ], function ($api) {
     $api->get('task/{id}', 'TaskController@show')->name('task.show');
+    // 资源集合响应(引入关联模型)
+    // 添加 meta 元数据、响应状态码、cookie、额外的响应头、
+    $api->get('task', 'TaskController@index')->name('task.list');
 });
 
 /**

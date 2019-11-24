@@ -229,4 +229,8 @@ return [
 
     ],
 
+    /**
+     * Paginate Per Page
+     */
+    'perPage' => env('API_PER_PAGE', 5),
 ];
