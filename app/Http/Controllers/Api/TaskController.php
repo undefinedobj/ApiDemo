@@ -6,9 +6,27 @@ use App\Http\Controllers\ApiController;
 use App\Task;
 use App\Transformers\TaskTransformer;
 use Illuminate\Http\Request;
+use League\Fractal\Pagination\Cursor;
 
 class TaskController extends ApiController
 {
+    /**
+     * Morphing 和 Morphed 事件
+     *
+     * 如果你需要控制响应数据如何被转化可以使用 Dingo 提供的 ResponseIsMorphing（转化前触发）
+     * 和 ResponseWasMorphed（转化后触发）事件。
+     * 结果见响应头的 link meta 部分
+     *
+     * @param Request $request
+     * @return \Dingo\Api\Http\Response
+     */
+    public function morphing(Request $request)
+    {
+        $limit = $request->input('limit') ? : 10;
+        $tasks = Task::paginate($limit);
+        return $this->response->paginator($tasks, new TaskTransformer());
+    }
+    
     /**
      * 资源集合响应(引入关联模型)
      *
@@ -22,8 +40,27 @@ class TaskController extends ApiController
         // return $this->response->collection($tasks, new TaskTransformer());
 
         // 分页响应
-        $tasks = Task::orderby('id', 'DESC')->paginate($request->per_page ?? config('api.perPage'));
-        return $this->response->paginator($tasks, new TaskTransformer());
+//        $tasks = Task::orderby('id', 'DESC')->paginate($request->per_page ?? config('api.perPage'));
+//        return $this->response->paginator($tasks, new TaskTransformer());
+
+        // cursor 设置游标
+        // 使用 Dingo API 扩展包快速构建 Laravel RESTful API（六）—— 转化器及响应构建器的高级使用
+        $current = $request->input('current');
+        $previous = $request->input('previous');
+        $limit = $request->input('limit') ? : 10;
+
+        if ($current) {
+            $tasks = Task::where('id', '>', $current)->take($limit)->get();
+        } else {
+            $tasks = Task::take($limit)->get();
+        }
+
+        $next = $tasks->last()->id;
+        $cursor = new Cursor($current, $previous, $next, $tasks->count());
+
+        return $this->response->collection($tasks, new TaskTransformer, [], function ($resource, $fractal) use ($cursor) {
+            $resource->setCursor($cursor);
+        });
     }
 
     /**

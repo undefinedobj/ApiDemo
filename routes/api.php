@@ -87,6 +87,11 @@ $api->version('v3',[
     // 资源集合响应(引入关联模型)
     // 添加 meta 元数据、响应状态码、cookie、额外的响应头、
     $api->get('task', 'TaskController@index')->name('task.list');
+    // Morphing 和 Morphed 事件
+    // 如果你需要控制响应数据如何被转化可以使用 Dingo 提供的 ResponseIsMorphing（转化前触发）
+    // 和 ResponseWasMorphed（转化后触发）事件。
+    // 结果见响应头的 link meta 部分
+    $api->get('task_morphing/{id}', 'TaskController@morphing')->name('task.morphing');
 });
 
 /**
